@@ -19,6 +19,8 @@ workflows:
           git submodule update --init --recursive
           xcodebuild -version
           python3 --version
+          sudo xcodebuild -downloadComponent MetalToolchain || xcodebuild -downloadComponent MetalToolchain || true
+          xcrun metal -v || true
       - name: Create Canonical Build Directory & Inject Secrets
         script: |
           set -ex
