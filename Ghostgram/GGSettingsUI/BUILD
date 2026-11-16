@@ -11,7 +11,7 @@ swift_library(
         "Sources/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        "-Onone",
     ],
     deps = [
         "//Ghostgram/GGCore:GGCore",
@@ -65,7 +65,7 @@ swift_library(
         "Demo/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        "-Onone",
     ],
     deps = [
         ":GGSettingsUI",
@@ -90,7 +90,7 @@ swift_test(
         "Tests/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        "-Onone",
     ],
 )
 

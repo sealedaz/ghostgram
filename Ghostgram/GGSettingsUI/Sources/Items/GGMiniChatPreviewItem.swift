@@ -359,8 +359,8 @@ private final class GGMiniChatPreviewItemNode: ListViewItemNode {
                 // The account's own emoji status (or the Premium star) after the name, as the chat's
                 // title shows it — unless «Скрыть эмодзи-статусы» is on.
                 if case .account = header.peer, let peer = item.accountPeer, !ggMiniChatHidesEmojiStatus() {
-                    if let emojiStatus = peer.emojiStatus {
-                        headerStatusIcon = (.animation(content: .customEmoji(fileId: emojiStatus.fileId), size: CGSize(width: 32.0, height: 32.0), placeholderColor: theme.list.mediaPlaceholderColor, themeColor: theme.list.itemAccentColor, loopMode: .count(2)), emojiStatus.color.flatMap { UIColor(rgb: UInt32(bitPattern: $0)) })
+                    if let emojiStatus = peer.emojiStatus, let fileId = emojiStatus.fileId {
+                        headerStatusIcon = (.animation(content: .customEmoji(fileId: fileId), size: CGSize(width: 32.0, height: 32.0), placeholderColor: theme.list.mediaPlaceholderColor, themeColor: theme.list.itemAccentColor, loopMode: .count(2)), emojiStatus.color.flatMap { UIColor(rgb: UInt32(bitPattern: $0)) })
                     } else if peer.isPremium && !PremiumConfiguration.with(appConfiguration: item.context.currentAppConfiguration.with { $0 }).isPremiumDisabled {
                         headerStatusIcon = (.premium(color: theme.list.itemAccentColor), nil)
                     }
