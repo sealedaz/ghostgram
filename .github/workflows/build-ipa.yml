@@ -1,0 +1,114 @@
+name: Build exteraGram AyuGram IPA (Free)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: 'Build number'
+        required: true
+        default: '100001'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build iOS IPA
+    runs-on: macos-latest
+    timeout-minutes: 240
+
+    steps:
+      - name: Checkout Repository with Submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create Canonical Build Directory
+        run: |
+          set -x
+          sudo mkdir -p /Users/Shared
+          cp -R "$GITHUB_WORKSPACE" /Users/Shared/
+          mv /Users/Shared/$(basename "$GITHUB_WORKSPACE") /Users/Shared/telegram-ios
+
+      - name: Inject Secure Telegram API Keys
+        env:
+          API_ID: ${{ secrets.TELEGRAM_API_ID }}
+          API_HASH: ${{ secrets.TELEGRAM_API_HASH }}
+        run: |
+          python3 -c "
+          import json, os
+          path = '/Users/Shared/telegram-ios/build-system/appstore-configuration.json'
+          with open(path, 'r') as f:
+              data = json.load(f)
+          data['api_id'] = str(os.environ.get('API_ID', '0'))
+          data['api_hash'] = str(os.environ.get('API_HASH', ''))
+          with open(path, 'w') as f:
+              json.dump(data, f, indent=2)
+          print('Secure API keys injected into runtime config.')
+          "
+
+      - name: Build Application with Bazel and Fake Codesigning
+        run: |
+          set -x
+          SOURCE_DIR=/Users/Shared/telegram-ios
+          cd "$SOURCE_DIR"
+
+          BAZEL_USER_ROOT="/private/var/tmp/_bazel_containerhost"
+          BUILD_NUM="${{ github.event.inputs.build_number }}"
+
+          # Import mock development certificates for fake codesigning
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs || true
+
+          # Build release arm64 target without requiring paid Apple Developer accounts
+          python3 -u build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --bazelUserRoot="$BAZEL_USER_ROOT" \
+            build \
+            --configurationPath="build-system/appstore-configuration.json" \
+            --codesigningInformationPath=build-system/fake-codesigning \
+            --configuration=release_arm64 \
+            --buildNumber="$BUILD_NUM"
+
+          # Collect IPA file
+          OUTPUT_PATH="$GITHUB_WORKSPACE/build/artifacts"
+          mkdir -p "$OUTPUT_PATH"
+
+          # Check common Bazel outputs
+          find bazel-out -name "*.ipa" -exec cp {} "$OUTPUT_PATH/exteraGram-AyuGram.ipa" \; || true
+          if [ ! -f "$OUTPUT_PATH/exteraGram-AyuGram.ipa" ] && [ -f "bazel-bin/Telegram/Telegram.ipa" ]; then
+            cp bazel-bin/Telegram/Telegram.ipa "$OUTPUT_PATH/exteraGram-AyuGram.ipa"
+          fi
+
+          ls -la "$OUTPUT_PATH"
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: exteraGram-AyuGram-iOS-IPA
+          path: build/artifacts/*.ipa
+          retention-days: 14
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: success()
+        with:
+          tag_name: v1.0.${{ github.event.inputs.build_number }}
+          name: exteraGram / AyuGram iOS v1.0.${{ github.event.inputs.build_number }}
+          body: |
+            ## 📱 exteraGram / AyuGram for iOS (Free IPA)
+            
+            - **Ghost Mode:** Read messages & stories secretly, hide typing, offline status.
+            - **Anti-Delete:** Deleted and edited messages preserved.
+            - **AyuForward:** Bypass restricted channels & copy protections.
+            - **Local Premium:** Free client-side Telegram Premium perks.
+            
+            ### 🚀 Установка:
+            1. **Sideloadly (Windows / Mac):** Перетащите `.ipa` в окно Sideloadly, укажите ваш бесплатный Apple ID и нажмите Start.
+            2. **TrollStore:** Откройте `.ipa` напрямую на поддерживаемом iPhone (iOS 14.0 - 17.0).
+          files: build/artifacts/*.ipa
