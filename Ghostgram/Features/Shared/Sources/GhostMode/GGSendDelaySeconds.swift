@@ -18,6 +18,18 @@ public enum GGSendDelaySeconds {
         return min(GGSendDelaySeconds.range.upperBound, max(GGSendDelaySeconds.range.lowerBound, value))
     }
 
+    /// Dynamic stealth delay formula (Phase 3.1):
+    /// - text: +12s from current time
+    /// - media (photo, video, file): max(6, ceil(fileSizeBytes / 1024.0 / 1024.0 * 4.5))
+    public static func dynamicDelay(hasMedia: Bool, fileSizeBytes: Int64?) -> Double {
+        if !hasMedia {
+            return 12.0
+        }
+        let bytes = Double(fileSizeBytes ?? 0)
+        let mb = bytes / (1024.0 * 1024.0)
+        return max(6.0, ceil(mb * 4.5))
+    }
+
     /// Builds ≤ 185: `sendDelay.textSeconds` and `sendDelay.mediaSeconds` (nil = never stored =
     /// their defaults) → the larger of the two. nil when neither was stored (the new default is
     /// already the larger default).

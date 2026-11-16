@@ -1,0 +1,23 @@
+{
+  "ayuFilters.autoClick": "Автокликер <button>",
+  "ayuFilters.autoClickInfo": "Безопасно нажимать подходящие кнопки",
+  "ayuFilters.delete": "Удалить",
+  "ayuFilters.dialogAdd": "Добавить фильтр",
+  "ayuFilters.dialogChatOnly": "Только для этого чата",
+  "ayuFilters.dialogPlaceholder": "Текст фильтра, regex или теги <type> / <button>",
+  "ayuFilters.dialogTitle": "Новый фильтр",
+  "ayuFilters.empty": "Нет добавленных фильтров",
+  "ayuFilters.export": "Экспорт фильтров",
+  "ayuFilters.importClipboard": "Импорт из буфера",
+  "ayuFilters.importError": "Ошибка импорта фильтров",
+  "ayuFilters.importMerge": "Объединить",
+  "ayuFilters.importPreview": "Найдено фильтров: {filters}, исключений: {exclusions}. Импортировать?",
+  "ayuFilters.importReplace": "Заменить все",
+  "ayuFilters.importSuccess": "Импортировано {filters} фильтров и {exclusions} исключений",
+  "ayuFilters.importUrl": "Импорт по ссылке",
+  "ayuFilters.list": "Список фильтров",
+  "ayuFilters.quickAdd": "Добавить в фильтры",
+  "ayuFilters.title": "Фильтры AyuGram",
+  "ayuFilters.toggle": "Включить фильтрацию",
+  "ayuFilters.toggleInfo": "Скрывать сообщения по правилам фильтрации"
+}

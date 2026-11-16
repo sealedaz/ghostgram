@@ -1417,6 +1417,113 @@ public enum GGStrings {
         }
     }
 
+    public enum AyuFilters {
+        /// Auto-click <button>
+        public static var autoClick: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.autoClick")
+        }
+
+        /// Safely auto-click matched inline buttons
+        public static var autoClickInfo: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.autoClickInfo")
+        }
+
+        /// Delete
+        public static var delete: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.delete")
+        }
+
+        /// Add Filter
+        public static var dialogAdd: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.dialogAdd")
+        }
+
+        /// This Chat Only
+        public static var dialogChatOnly: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.dialogChatOnly")
+        }
+
+        /// Filter text, regex, or <type> / <button> tags
+        public static var dialogPlaceholder: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.dialogPlaceholder")
+        }
+
+        /// Add Filter Rule
+        public static var dialogTitle: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.dialogTitle")
+        }
+
+        /// No filters added yet
+        public static var empty: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.empty")
+        }
+
+        /// Export Filters
+        public static var export: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.export")
+        }
+
+        /// Import from Clipboard
+        public static var importClipboard: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.importClipboard")
+        }
+
+        /// Filter Import Error
+        public static var importError: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.importError")
+        }
+
+        /// Merge
+        public static var importMerge: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.importMerge")
+        }
+
+        /// Found {filters} filters and {exclusions} exclusions. Do you want to import them?
+        public static func importPreview(filters: Swift.String, exclusions: Swift.String) -> Swift.String {
+            return GGLocalization.shared.format("ayuFilters.importPreview", [("filters", filters), ("exclusions", exclusions)])
+        }
+
+        /// Replace All
+        public static var importReplace: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.importReplace")
+        }
+
+        /// Imported {filters} filters and {exclusions} exclusions
+        public static func importSuccess(filters: Swift.String, exclusions: Swift.String) -> Swift.String {
+            return GGLocalization.shared.format("ayuFilters.importSuccess", [("filters", filters), ("exclusions", exclusions)])
+        }
+
+        /// Import from URL
+        public static var importUrl: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.importUrl")
+        }
+
+        /// Filters List
+        public static var list: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.list")
+        }
+
+        /// Add to AyuFilters
+        public static var quickAdd: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.quickAdd")
+        }
+
+        /// AyuGram Filters
+        public static var title: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.title")
+        }
+
+        /// Enable Filters
+        public static var toggle: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.toggle")
+        }
+
+        /// Hide messages matching filter rules
+        public static var toggleInfo: Swift.String {
+            return GGLocalization.shared.string("ayuFilters.toggleInfo")
+        }
+    }
+
     public enum Bookmarks {
         public enum All {
             /// No bookmarks yet. Long press a message › «Bookmark».

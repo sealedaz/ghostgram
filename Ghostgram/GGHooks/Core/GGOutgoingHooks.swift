@@ -54,6 +54,28 @@ public struct GGOutgoingDelayRequest {
     public let attributes: [[MessageAttribute]]
     /// The server's time now (`Network.globalTime`).
     public let serverTime: Double
+    /// Whether any message in the batch has media.
+    public let hasMedia: Bool
+    /// Maximum media file size in bytes, if known.
+    public let mediaSizeBytes: Int64?
+
+    public init(
+        accountPeerId: PeerId,
+        peerId: PeerId,
+        peer: Peer?,
+        attributes: [[MessageAttribute]],
+        serverTime: Double,
+        hasMedia: Bool = false,
+        mediaSizeBytes: Int64? = nil
+    ) {
+        self.accountPeerId = accountPeerId
+        self.peerId = peerId
+        self.peer = peer
+        self.attributes = attributes
+        self.serverTime = serverTime
+        self.hasMedia = hasMedia
+        self.mediaSizeBytes = mediaSizeBytes
+    }
 }
 
 /// A message of a standalone sender (share extension, quick forward, Siri) the server accepted. That
@@ -143,7 +165,38 @@ func ggApplyOutgoingSendDelay(_ messages: [(Bool, EnqueueMessage)], transaction:
     if GGOutgoingHooks.sendDelay.isEmpty || messages.isEmpty {
         return messages
     }
-    let request = GGOutgoingDelayRequest(accountPeerId: account.peerId, peerId: peerId, peer: transaction.getPeer(peerId), attributes: messages.map { $0.1.attributes }, serverTime: account.network.globalTime)
+    var hasMedia = false
+    var maxMediaSize: Int64? = nil
+    for (_, message) in messages {
+        switch message {
+        case let .message(_, _, _, mediaReference, _, _, _, _, _, _):
+            if let mediaReference = mediaReference {
+                hasMedia = true
+                let media = mediaReference.media
+                if let file = media as? TelegramMediaFile {
+                    if let size = file.size {
+                        maxMediaSize = max(maxMediaSize ?? 0, size)
+                    }
+                } else if let image = media as? TelegramMediaImage {
+                    let size = image.representations.compactMap { $0.resource.size }.max()
+                    if let size = size {
+                        maxMediaSize = max(maxMediaSize ?? 0, size)
+                    }
+                }
+            }
+        case .forward:
+            break
+        }
+    }
+    let request = GGOutgoingDelayRequest(
+        accountPeerId: account.peerId,
+        peerId: peerId,
+        peer: transaction.getPeer(peerId),
+        attributes: messages.map { $0.1.attributes },
+        serverTime: account.network.globalTime,
+        hasMedia: hasMedia,
+        mediaSizeBytes: maxMediaSize
+    )
     guard let scheduleTime = ggOutgoingSendDelay(request) else {
         return messages
     }
@@ -158,11 +211,11 @@ func ggApplyOutgoingSendDelay(_ messages: [(Bool, EnqueueMessage)], transaction:
 
 /// GHOST hook target: a standalone sender, inside its transaction. The message is not stored locally:
 /// the schedule goes straight into the request. Nil — send now.
-func ggStandaloneSendDelay(accountPeerId: PeerId, peerId: PeerId, peer: Peer, attributes: [MessageAttribute], serverTime: Double) -> Int32? {
+func ggStandaloneSendDelay(accountPeerId: PeerId, peerId: PeerId, peer: Peer, attributes: [MessageAttribute], serverTime: Double, hasMedia: Bool = false, mediaSizeBytes: Int64? = nil) -> Int32? {
     if GGOutgoingHooks.sendDelay.isEmpty {
         return nil
     }
-    return ggOutgoingSendDelay(GGOutgoingDelayRequest(accountPeerId: accountPeerId, peerId: peerId, peer: peer, attributes: [attributes], serverTime: serverTime))
+    return ggOutgoingSendDelay(GGOutgoingDelayRequest(accountPeerId: accountPeerId, peerId: peerId, peer: peer, attributes: [attributes], serverTime: serverTime, hasMedia: hasMedia, mediaSizeBytes: mediaSizeBytes))
 }
 
 /// GHOST hook target: the server accepted a standalone sender's message.

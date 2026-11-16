@@ -30,6 +30,8 @@ swift_library(
         "//Ghostgram/Features/Extras:GGExtras",
         # W7-RD2: «Дата регистрации»
         "//Ghostgram/Features/RegDate:GGRegDate",
+        # Phase 5: AyuGram JSON v2 Filters Engine
+        "//Ghostgram/Features/AyuFilters:GGAyuFilters",
     ],
     visibility = [
         "//visibility:public",

@@ -1,0 +1,23 @@
+{
+  "ayuFilters.autoClick": "Auto-click <button>",
+  "ayuFilters.autoClickInfo": "Safely auto-click matched inline buttons",
+  "ayuFilters.delete": "Delete",
+  "ayuFilters.dialogAdd": "Add Filter",
+  "ayuFilters.dialogChatOnly": "This Chat Only",
+  "ayuFilters.dialogPlaceholder": "Filter text, regex, or <type> / <button> tags",
+  "ayuFilters.dialogTitle": "Add Filter Rule",
+  "ayuFilters.empty": "No filters added yet",
+  "ayuFilters.export": "Export Filters",
+  "ayuFilters.importClipboard": "Import from Clipboard",
+  "ayuFilters.importError": "Filter Import Error",
+  "ayuFilters.importMerge": "Merge",
+  "ayuFilters.importPreview": "Found {filters} filters and {exclusions} exclusions. Do you want to import them?",
+  "ayuFilters.importReplace": "Replace All",
+  "ayuFilters.importSuccess": "Imported {filters} filters and {exclusions} exclusions",
+  "ayuFilters.importUrl": "Import from URL",
+  "ayuFilters.list": "Filters List",
+  "ayuFilters.quickAdd": "Add to AyuFilters",
+  "ayuFilters.title": "AyuGram Filters",
+  "ayuFilters.toggle": "Enable Filters",
+  "ayuFilters.toggleInfo": "Hide messages matching filter rules"
+}

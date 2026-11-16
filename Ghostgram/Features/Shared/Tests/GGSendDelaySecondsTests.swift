@@ -27,4 +27,21 @@ final class GGSendDelaySecondsTests: XCTestCase {
         XCTAssertEqual(GGSendDelaySeconds.clamped(.nan), GGSendDelaySeconds.defaultValue)
         XCTAssertEqual(GGSendDelaySeconds.clamped(61.0), 61.0)
     }
+
+    func testDynamicDelayFormula() {
+        // Text messages: always +12 seconds
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: false, fileSizeBytes: nil), 12.0)
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: false, fileSizeBytes: 10 * 1024 * 1024), 12.0)
+
+        // Media messages: minimum 6 seconds
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: nil), 6.0)
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 0), 6.0)
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 500 * 1024), 6.0)
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 1 * 1024 * 1024), 6.0) // 1MB -> ceil(4.5) = 5 -> max(6, 5) = 6.0
+
+        // Media messages: dynamic calculation max(6, ceil(mb * 4.5))
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 2 * 1024 * 1024), 9.0) // 2MB -> ceil(9.0) = 9.0
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 10 * 1024 * 1024), 45.0) // 10MB -> ceil(45.0) = 45.0
+        XCTAssertEqual(GGSendDelaySeconds.dynamicDelay(hasMedia: true, fileSizeBytes: 50 * 1024 * 1024), 225.0) // 50MB -> ceil(225.0) = 225.0
+    }
 }

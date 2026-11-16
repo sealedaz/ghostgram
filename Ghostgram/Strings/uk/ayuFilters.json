@@ -1,0 +1,23 @@
+{
+  "ayuFilters.autoClick": "Автоклікер <button>",
+  "ayuFilters.autoClickInfo": "Безпечно натискати відповідні кнопки",
+  "ayuFilters.delete": "Видалити",
+  "ayuFilters.dialogAdd": "Додати фільтр",
+  "ayuFilters.dialogChatOnly": "Тільки для цього чату",
+  "ayuFilters.dialogPlaceholder": "Текст фільтра, regex або теги <type> / <button>",
+  "ayuFilters.dialogTitle": "Новий фільтр",
+  "ayuFilters.empty": "Немає доданих фільтрів",
+  "ayuFilters.export": "Експорт фільтрів",
+  "ayuFilters.importClipboard": "Імпорт з буфера",
+  "ayuFilters.importError": "Помилка імпорту фільтрів",
+  "ayuFilters.importMerge": "Об'єднати",
+  "ayuFilters.importPreview": "Знайдено фільтрів: {filters}, винятків: {exclusions}. Імпортувати?",
+  "ayuFilters.importReplace": "Замінити всі",
+  "ayuFilters.importSuccess": "Імпортовано {filters} фільтрів та {exclusions} винятків",
+  "ayuFilters.importUrl": "Імпорт за посиланням",
+  "ayuFilters.list": "Список фільтрів",
+  "ayuFilters.quickAdd": "Додати до фільтрів",
+  "ayuFilters.title": "Фільтри AyuGram",
+  "ayuFilters.toggle": "Увімкнути фільтрацію",
+  "ayuFilters.toggleInfo": "Приховувати повідомлення за правилами фільтрації"
+}

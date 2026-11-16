@@ -165,10 +165,13 @@ public enum GGGhostPolicy {
 /// Send delay («Отложенная отправка»): the one decision every path uses — the stored sends and the
 /// standalone senders (share extension, quick forward, Siri) ask the same `GGOutgoingHooks.sendDelay`.
 public enum GGSendDelayPolicy {
-    /// nil = send now. One delay for text and media. `peer` is the chat as stored (asked inside the
-    /// transaction); only when Postbox does not know it does the peer kind cache decide «bot».
-    public static func scheduleTime(account: GGAccountID, accountPeerId: PeerId, peerId: PeerId, peer: Peer?, serverTime: Double) -> Int32? {
-        if !GGGhostSettings.sendDelayEnabled.value(for: account) {
+    /// nil = send now. Exact AyuGram stealth delay formula: text +12s, media dynamic.
+    /// `peer` is the chat as stored (asked inside the transaction); only when Postbox does not know it does the peer kind cache decide «bot».
+    public static func scheduleTime(account: GGAccountID, accountPeerId: PeerId, peerId: PeerId, peer: Peer?, serverTime: Double, hasMedia: Bool = false, mediaSizeBytes: Int64? = nil) -> Int32? {
+        guard GGGhostPolicy.isEnabled(account) else {
+            return nil
+        }
+        guard GGGhostSettings.sendDelayEnabled.value(for: account) else {
             return nil
         }
         // «Избранное» is a notebook: a scheduled message there is a reminder, not a hidden send.
@@ -186,8 +189,7 @@ public enum GGSendDelayPolicy {
         } else if GGGhostPeerTraits.shared.isBot(peerId, account: account) {
             return nil
         }
-        // The server sends at once anything scheduled less than ~10 s ahead: the range keeps a margin.
-        let delay = GGSendDelaySeconds.clamped(GGGhostSettings.sendDelaySeconds.value(for: account))
+        let delay = GGSendDelaySeconds.dynamicDelay(hasMedia: hasMedia, fileSizeBytes: mediaSizeBytes)
         return Int32(serverTime + delay)
     }
 

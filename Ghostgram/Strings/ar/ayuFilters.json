@@ -1,0 +1,23 @@
+{
+  "ayuFilters.autoClick": "النقر التلقائي على <button>",
+  "ayuFilters.autoClickInfo": "النقر الآمن على الأزرار المضمنة المطابقة",
+  "ayuFilters.delete": "حذف",
+  "ayuFilters.dialogAdd": "إضافة مرشح",
+  "ayuFilters.dialogChatOnly": "لهذه المحادثة فقط",
+  "ayuFilters.dialogPlaceholder": "نص المرشح أو التعبير النمطي أو وسوم <type> / <button>",
+  "ayuFilters.dialogTitle": "مرشح جديد",
+  "ayuFilters.empty": "لم تتم إضافة أي مرشحات بعد",
+  "ayuFilters.export": "تصدير المرشحات",
+  "ayuFilters.importClipboard": "استيراد من الحافظة",
+  "ayuFilters.importError": "خطأ في استيراد المرشحات",
+  "ayuFilters.importMerge": "دمج",
+  "ayuFilters.importPreview": "تم العثور على {filters} مرشحاً و {exclusions} استثناءً. هل ترغب في استيرادها؟",
+  "ayuFilters.importReplace": "استبدال الكل",
+  "ayuFilters.importSuccess": "تم استيراد {filters} مرشحاً و {exclusions} استثناءً",
+  "ayuFilters.importUrl": "استيراد من رابط",
+  "ayuFilters.list": "قائمة المرشحات",
+  "ayuFilters.quickAdd": "إضافة إلى المرشحات",
+  "ayuFilters.title": "مرشحات AyuGram",
+  "ayuFilters.toggle": "تفعيل المرشحات",
+  "ayuFilters.toggleInfo": "إخفاء الرسائل المطابقة لقواعد التصفية"
+}

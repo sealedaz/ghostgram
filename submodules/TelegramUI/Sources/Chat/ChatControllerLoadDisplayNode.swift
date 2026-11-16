@@ -5268,7 +5268,19 @@ extension ChatControllerImpl {
                         }
                     }
                     let actions: [TextAlertAction]
-                    if moreInfo {
+                    if reason == .tooMuchScheduled {
+                        actions = [
+                            TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.Conversation_ScheduleMessage_SendToday, action: {
+                                if let strongSelf = self {
+                                    let failedIds = strongSelf.context.account.postbox.failedMessageIds(for: peerId)
+                                    if !failedIds.isEmpty {
+                                        let _ = resendMessages(account: strongSelf.context.account, messageIds: failedIds).startStrict()
+                                    }
+                                }
+                            }),
+                            TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_OK, action: {})
+                        ]
+                    } else if moreInfo {
                         actions = [TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.Generic_ErrorMoreInfo, action: {
                             self?.openPeerMention("spambot", navigation: .chat(textInputState: nil, subject: nil, peekData: nil))
                         }), TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_OK, action: {})]

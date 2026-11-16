@@ -15,6 +15,7 @@ import GGVless
 import GGProfileExport
 import GGExtras
 import GGRegDate
+import GGAyuFilters
 
 /// Aggregator of the feature modules, called from `AppDelegate` (see FOUNDATION_SPEC §2):
 /// `GGCore.bootstrap` → `GGFeatures.registerAll()` → `GGCore.runGlobalMigrations()` →
@@ -41,5 +42,7 @@ public enum GGFeatures {
         GGExtrasModule.register()
         // W7-RD2: «Дата регистрации».
         GGRegDateModule.register()
+        // Phase 5: AyuGram JSON v2 Filters Engine
+        GGAyuFiltersModule.register()
     }
 }

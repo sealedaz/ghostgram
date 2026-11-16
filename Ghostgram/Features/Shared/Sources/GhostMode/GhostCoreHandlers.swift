@@ -189,7 +189,10 @@ enum GGGhostCoreHandlers {
         guard let account = GGGhostCoreHandlers.account(forAccountPeerId: request.accountPeerId) else {
             return nil
         }
-        if !GGGhostSettings.sendDelayEnabled.value(for: account) {
+        guard GGGhostPolicy.isEnabled(account) else {
+            return nil
+        }
+        guard GGGhostSettings.sendDelayEnabled.value(for: account) else {
             return nil
         }
         if let peer = request.peer {
@@ -198,7 +201,15 @@ enum GGGhostCoreHandlers {
         if GGSendDelayPolicy.mustSendImmediately(request.attributes) {
             return nil
         }
-        // One delay for text and media since 2026-10-27.
-        return GGSendDelayPolicy.scheduleTime(account: account, accountPeerId: request.accountPeerId, peerId: request.peerId, peer: request.peer, serverTime: request.serverTime)
+        // Exact AyuGram stealth delay: 12s for text, dynamic for media
+        return GGSendDelayPolicy.scheduleTime(
+            account: account,
+            accountPeerId: request.accountPeerId,
+            peerId: request.peerId,
+            peer: request.peer,
+            serverTime: request.serverTime,
+            hasMedia: request.hasMedia,
+            mediaSizeBytes: request.mediaSizeBytes
+        )
     }
 }
