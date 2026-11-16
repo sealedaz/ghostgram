@@ -30,6 +30,7 @@ workflows:
           cp -R "$CM_BUILD_DIR" /Users/Shared/
           mv /Users/Shared/$(basename "$CM_BUILD_DIR") /Users/Shared/telegram-ios
           cd /Users/Shared/telegram-ios
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs || true
           python3 -c "
           import json, os
           path = '/Users/Shared/telegram-ios/build-system/appstore-configuration.json'
