@@ -1,0 +1,57 @@
+workflows:
+  ghostgram-ios-ipa:
+    name: Build AyuGram iOS IPA
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    environment:
+      xcode: latest
+    cache:
+      cache_paths:
+        - $HOME/Library/Caches/Bazel
+        - $HOME/.cache/bazel
+        - $HOME/telegram-bazel-cache
+    scripts:
+      - name: Check Environment & Submodules
+        script: |
+          set -e
+          git submodule update --init --recursive
+          xcodebuild -version
+          python3 --version
+      - name: Create Canonical Build Directory & Inject Secrets
+        script: |
+          set -ex
+          test -n "$TELEGRAM_API_ID"
+          test -n "$TELEGRAM_API_HASH"
+          sudo mkdir -p /Users/Shared
+          cp -R "$CM_BUILD_DIR" /Users/Shared/
+          mv /Users/Shared/$(basename "$CM_BUILD_DIR") /Users/Shared/telegram-ios
+          cd /Users/Shared/telegram-ios
+          python3 -c "
+          import json, os
+          path = '/Users/Shared/telegram-ios/build-system/appstore-configuration.json'
+          with open(path, 'r') as f:
+              data = json.load(f)
+          data['api_id'] = str(os.environ.get('TELEGRAM_API_ID', '0'))
+          data['api_hash'] = str(os.environ.get('TELEGRAM_API_HASH', ''))
+          with open(path, 'w') as f:
+              json.dump(data, f, indent=2)
+          print('Secure API keys injected into runtime configuration.')
+          "
+      - name: Build IPA with Bazel and Fake Codesigning
+        script: |
+          set -ex
+          cd /Users/Shared/telegram-ios
+          mkdir -p "$CM_BUILD_DIR/artifacts"
+          python3 build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --cacheDir ~/telegram-bazel-cache \
+            build \
+            --configurationPath=build-system/appstore-configuration.json \
+            --codesigningInformationPath=build-system/fake-codesigning \
+            --buildNumber=${BUILD_NUMBER:-100001} \
+            --configuration=release_arm64 \
+            --outputBuildArtifactsPath="$CM_BUILD_DIR/artifacts"
+    artifacts:
+      - artifacts/*.ipa
+      - build-output/ipa/*.ipa
+      - "**/*.ipa"
