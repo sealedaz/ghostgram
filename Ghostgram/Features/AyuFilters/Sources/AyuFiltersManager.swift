@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 import Postbox
 import TelegramCore
+import SwiftSignalKit
 import AccountContext
 import GGCore
 
@@ -137,20 +138,36 @@ public final class AyuFiltersManager {
             return false
         }
 
-        let dialogId = message.id.peerId.toInt64()
+        let peerId = message.id.peerId
+        let dialogId = peerId.toInt64()
+        var altDialogId: Int64? = nil
+        switch peerId.namespace {
+        case Namespaces.Peer.CloudUser:
+            altDialogId = peerId.id._internalGetInt64Value()
+        case Namespaces.Peer.CloudGroup:
+            altDialogId = -peerId.id._internalGetInt64Value()
+        case Namespaces.Peer.CloudChannel:
+            altDialogId = -(1000000000000 + peerId.id._internalGetInt64Value())
+        case Namespaces.Peer.SecretChat:
+            altDialogId = peerId.id._internalGetInt64Value()
+        default:
+            break
+        }
 
         // Extract message text (in Telegram-iOS, captions are stored in message.text)
         var messageText = message.text
 
-        // Also check media filename if text is empty
-        if messageText.isEmpty {
-            for media in message.media {
-                if let file = media as? TelegramMediaFile {
-                    for attr in file.attributes {
-                        if let filenameAttr = attr as? TelegramMediaFileAttributeFilename {
+        // Also check media filename
+        for media in message.media {
+            if let file = media as? TelegramMediaFile {
+                for attr in file.attributes {
+                    if let filenameAttr = attr as? TelegramMediaFileAttributeFilename {
+                        if messageText.isEmpty {
                             messageText = filenameAttr.fileName
-                            break
+                        } else {
+                            messageText += "\n" + filenameAttr.fileName
                         }
+                        break
                     }
                 }
             }
@@ -173,7 +190,7 @@ public final class AyuFiltersManager {
             }
         }
 
-        guard let match = self.engine.shouldFilter(dialogId: dialogId, text: messageText, buttonTitles: buttonTitles) else {
+        guard let match = self.engine.shouldFilter(dialogId: dialogId, altDialogId: altDialogId, text: messageText, buttonTitles: buttonTitles) else {
             return false
         }
 
@@ -223,7 +240,7 @@ public final class AyuFiltersManager {
 
         DispatchQueue.main.async {
             let engine = TelegramEngine(account: context.account)
-            let _ = engine.messages.requestMessageActionCallback(messageId: messageId, data: target.data).startStrict()
+            let _ = engine.messages.requestMessageActionCallback(messageId: messageId, isGame: false, password: nil, data: target.data).startStrict()
         }
     }
 }

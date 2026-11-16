@@ -117,7 +117,7 @@ public struct AyuFiltersConfig: Codable, Equatable {
         } else if let stringIds = try? container.decode([String].self, forKey: .exclusions) {
             self.exclusions = stringIds.compactMap { Int64($0) }
         } else if let objectArray = try? container.decode([[String: Int64]].self, forKey: .exclusions) {
-            self.exclusions = objectArray.compactMap { $0["dialogId"] }
+            self.exclusions = objectArray.compactMap { $0["dialogId"] ?? $0["id"] }
         } else {
             self.exclusions = []
         }

@@ -812,7 +812,7 @@ public func enqueueWelcomeMessages(account: Account, peerId: PeerId, messages: [
     }
 }
 
-public func resendMessages(account: Account, messageIds: [MessageId]) -> Signal<Void, NoError> {
+public func resendMessages(account: Account, messageIds: [MessageId], removeSchedule: Bool = false) -> Signal<Void, NoError> {
     return account.postbox.transaction { transaction -> Void in
         var removeMessageIds: [MessageId] = []
         for (peerId, ids) in messagesIdsGroupedByPeerId(messageIds) {
@@ -840,7 +840,9 @@ public func resendMessages(account: Account, messageIds: [MessageId]) -> Signal<
                     var bubbleUpEmojiOrStickersets: [ItemCollectionId] = []
                     var forwardSource: MessageId?
                     inner: for attribute in message.attributes {
-                        if let attribute = attribute as? ReplyMessageAttribute {
+                        if removeSchedule && attribute is OutgoingScheduleInfoMessageAttribute {
+                            continue inner
+                        } else if let attribute = attribute as? ReplyMessageAttribute {
                             replyToMessageId = resentReplySubject(attribute)
                         } else if let attribute = attribute as? ReplyStoryAttribute {
                             replyToStoryId = attribute.storyId

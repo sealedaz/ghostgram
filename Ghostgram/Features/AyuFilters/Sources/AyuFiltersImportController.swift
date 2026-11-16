@@ -10,6 +10,7 @@ public enum AyuFiltersImportController {
     private static let allowedHosts: Set<String> = [
         "dpaste.com",
         "gist.githubusercontent.com",
+        "gist.github.com",
         "pastebin.com",
         "nekobin.com"
     ]
@@ -30,7 +31,13 @@ public enum AyuFiltersImportController {
         }
 
         // Convert page URLs to raw content URLs
-        if host.contains("pastebin.com") && !url.path.contains("/raw/") {
+        if host.contains("gist.github.com") && !host.contains("gist.githubusercontent.com") {
+            let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            if !path.isEmpty {
+                let cleanPath = path.hasSuffix("/raw") ? String(path.dropLast(4)) : path
+                return URL(string: "https://gist.githubusercontent.com/\(cleanPath)/raw")
+            }
+        } else if host.contains("pastebin.com") && !url.path.contains("/raw/") {
             let path = url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
             if !path.isEmpty {
                 return URL(string: "https://pastebin.com/raw/\(path)")

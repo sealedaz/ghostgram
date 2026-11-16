@@ -25,6 +25,7 @@ swift_library(
         "//submodules/ItemListUI:ItemListUI",
         "//submodules/PresentationDataUtils:PresentationDataUtils",
         "//submodules/AlertUI:AlertUI",
+        "//submodules/PromptUI:PromptUI",
         "//submodules/ContextUI:ContextUI",
         "//submodules/AppBundle:AppBundle",
         "//submodules/UndoUI:UndoUI",

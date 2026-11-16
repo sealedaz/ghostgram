@@ -1,6 +1,5 @@
 import Foundation
 import XCTest
-@testable import GGAyuFilters
 
 final class AyuFiltersEngineTests: XCTestCase {
     func testJsonV2DecodingAndEncoding() throws {
@@ -67,11 +66,16 @@ final class AyuFiltersEngineTests: XCTestCase {
         XCTAssertTrue(validCompiled.matches(text: "h123llo world", buttonTitles: []))
         XCTAssertFalse(validCompiled.matches(text: "hallo world", buttonTitles: []))
 
-        // Invalid regex must not crash and fail safely
+        // Invalid regex must not crash and fail safely (even if reversed)
         let invalidRule = AyuFilterRule(id: 2, text: "[unclosed-bracket(", caseInsensitive: true, enabled: true)
         let invalidCompiled = AyuCompiledFilter(rule: invalidRule)
         XCTAssertNil(invalidCompiled.regex)
         XCTAssertFalse(invalidCompiled.matches(text: "any text", buttonTitles: []))
+
+        let invalidReversedRule = AyuFilterRule(id: 3, text: "[unclosed-bracket(", reversed: true, caseInsensitive: true, enabled: true)
+        let invalidReversedCompiled = AyuCompiledFilter(rule: invalidReversedRule)
+        XCTAssertNil(invalidReversedCompiled.regex)
+        XCTAssertFalse(invalidReversedCompiled.matches(text: "any text", buttonTitles: []))
     }
 
     func testTypeTagsParsing() {
@@ -149,8 +153,25 @@ final class AyuFiltersEngineTests: XCTestCase {
         // 2. Chat in exclusions is never filtered even with matching text
         XCTAssertNil(engine.shouldFilter(dialogId: -100999, text: "some global_spam text", buttonTitles: []))
 
-        // 3. Per-chat filter only matches in that chat
+        // 3. Per-chat filter only matches in that chat (tested with direct dialogId and altDialogId)
         XCTAssertNotNil(engine.shouldFilter(dialogId: -100555, text: "some chat_only text", buttonTitles: []))
+        XCTAssertNotNil(engine.shouldFilter(dialogId: 999999, altDialogId: -100555, text: "some chat_only text", buttonTitles: []))
         XCTAssertNil(engine.shouldFilter(dialogId: -100111, text: "some chat_only text", buttonTitles: []))
+    }
+
+    func testFlexibleExclusionsDecoding() throws {
+        let json = """
+        {
+            "version": 2,
+            "filters": [],
+            "exclusions": [
+                {"id": -100111222},
+                {"dialogId": -100333444}
+            ]
+        }
+        """
+        let data = json.data(using: .utf8)!
+        let config = try JSONDecoder().decode(AyuFiltersConfig.self, from: data)
+        XCTAssertEqual(config.exclusions.sorted(), [-100333444, -100111222].sorted())
     }
 }

@@ -7,6 +7,7 @@ import AlertUI
 import PresentationDataUtils
 import AppBundle
 import UndoUI
+import PromptUI
 import GGCore
 import GGHooks
 import GGSettingsUI
@@ -83,37 +84,35 @@ public enum AyuFiltersMenu {
             title: { GGStrings.AyuFilters.importUrl },
             kind: .action({ context, controller in
                 let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-                var textInput: String = ""
-                let alert = textAlertController(
+                let clipboardString = UIPasteboard.general.string
+                let suggestedValue: String? = (clipboardString?.contains("dpaste") == true || clipboardString?.contains("github") == true || clipboardString?.contains("pastebin") == true || clipboardString?.contains("nekobin") == true) ? clipboardString : nil
+
+                let prompt = promptController(
                     context: context,
-                    updatedPresentationData: nil,
-                    title: GGStrings.AyuFilters.importUrl,
-                    text: "Supported: dpaste.com, gist.githubusercontent.com, pastebin.com, nekobin.com",
-                    actions: [
-                        TextAlertAction(type: .genericAction, title: presentationData.strings.Common_Cancel, action: {}),
-                        TextAlertAction(type: .defaultAction, title: "Fetch", action: {
-                            if let pasteboardString = UIPasteboard.general.string, !pasteboardString.isEmpty {
-                                textInput = pasteboardString
+                    text: GGStrings.AyuFilters.importUrl,
+                    subtitle: "dpaste.com, gist.githubusercontent.com, pastebin.com, nekobin.com",
+                    value: suggestedValue,
+                    placeholder: "https://pastebin.com/raw/...",
+                    characterLimit: 2048,
+                    apply: { urlString in
+                        guard let raw = urlString?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else { return }
+                        AyuFiltersImportController.fetchAndPreview(
+                            urlString: raw,
+                            context: context,
+                            present: { c in controller.present(c, in: .window(.root)) },
+                            onComplete: {
+                                let toast = UndoOverlayController(
+                                    presentationData: presentationData,
+                                    content: .info(title: nil, text: "Filters imported successfully", timeout: nil, customUndoText: nil),
+                                    elevatedLayout: false,
+                                    action: { _ in false }
+                                )
+                                context.sharedContext.mainWindow?.present(toast, on: .root)
                             }
-                            guard !textInput.isEmpty else { return }
-                            AyuFiltersImportController.fetchAndPreview(
-                                urlString: textInput,
-                                context: context,
-                                present: { c in controller.present(c, in: .window(.root)) },
-                                onComplete: {
-                                    let toast = UndoOverlayController(
-                                        presentationData: presentationData,
-                                        content: .info(title: nil, text: "Filters imported successfully", timeout: nil, customUndoText: nil),
-                                        elevatedLayout: false,
-                                        action: { _ in false }
-                                    )
-                                    context.sharedContext.mainWindow?.present(toast, on: .root)
-                                }
-                            )
-                        })
-                    ]
+                        )
+                    }
                 )
-                controller.present(alert, in: .window(.root))
+                controller.present(prompt, in: .window(.root))
             })
         ))
 

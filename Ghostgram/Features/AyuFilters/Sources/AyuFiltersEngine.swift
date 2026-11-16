@@ -97,6 +97,11 @@ public final class AyuCompiledFilter {
             return false
         }
 
+        // Invalid regex protection: if regex compilation failed, it must NEVER match anything, even if reversed
+        if (self.matchMode == .regex || self.matchMode == .word) && self.regex == nil && !self.cleanPattern.isEmpty {
+            return false
+        }
+
         // If <button> tag is specified, verify button matching first
         if let bPat = self.buttonPattern {
             if buttonTitles.isEmpty {
@@ -199,7 +204,7 @@ public final class AyuFiltersEngine {
         self.perChatFilters = newPerChat
     }
 
-    public func shouldFilter(dialogId: Int64, text: String, buttonTitles: [String]) -> AyuFilterMatchResult? {
+    public func shouldFilter(dialogId: Int64, altDialogId: Int64? = nil, text: String, buttonTitles: [String]) -> AyuFilterMatchResult? {
         self.lock.lock()
         defer { self.lock.unlock() }
 
@@ -208,21 +213,23 @@ public final class AyuFiltersEngine {
         }
 
         // Exclusions: if the chat is in exclusions, skip filtering completely
-        if self.exclusions.contains(dialogId) {
+        if self.exclusions.contains(dialogId) || (altDialogId != nil && self.exclusions.contains(altDialogId!)) {
             return nil
         }
 
         // 1. Check Per-chat filters first
-        if let chatFilters = self.perChatFilters[dialogId] {
-            for filter in chatFilters {
-                if filter.matches(text: text, buttonTitles: buttonTitles) {
-                    let shouldClick = (self.autoClickButtonsEnabled && (filter.rule.autoClickButton ?? true))
-                    return AyuFilterMatchResult(
-                        matchedRule: filter.rule,
-                        shouldAutoClickButton: shouldClick,
-                        targetButtonPattern: filter.buttonPattern
-                    )
-                }
+        var candidateChatFilters = self.perChatFilters[dialogId] ?? []
+        if let alt = altDialogId, let altFilters = self.perChatFilters[alt] {
+            candidateChatFilters.append(contentsOf: altFilters)
+        }
+        for filter in candidateChatFilters {
+            if filter.matches(text: text, buttonTitles: buttonTitles) {
+                let shouldClick = (self.autoClickButtonsEnabled && (filter.rule.autoClickButton ?? true))
+                return AyuFilterMatchResult(
+                    matchedRule: filter.rule,
+                    shouldAutoClickButton: shouldClick,
+                    targetButtonPattern: filter.buttonPattern
+                )
             }
         }
 

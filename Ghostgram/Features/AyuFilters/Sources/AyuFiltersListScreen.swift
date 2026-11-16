@@ -8,6 +8,7 @@ import AccountContext
 import ItemListUI
 import PresentationDataUtils
 import AlertUI
+import PromptUI
 import GGCore
 
 private final class AyuFiltersListArguments {
@@ -130,7 +131,6 @@ private enum AyuFiltersListEntry: ItemListNodeEntry {
         case let .sharedHeader(text), let .chatHeader(text), let .exclusionsHeader(text):
             return ItemListSectionHeaderItem(presentationData: presentationData, text: text, sectionId: self.section)
         case let .sharedFilter(_, rule), let .chatFilter(_, rule):
-            let label = rule.enabled ? "Active" : "Disabled"
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 title: rule.text,
@@ -186,7 +186,7 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
         }
     )
 
-    let signal = combineLatest(queue: .mainQueue(), context.sharedContext.presentationData, updateSignal.get())
+    let signal = combineLatest(context.sharedContext.presentationData, updateSignal.get())
     |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let config = AyuFiltersManager.shared.config
         var entries: [AyuFiltersListEntry] = []
@@ -270,18 +270,29 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
 
     addRuleImpl = { [weak controller] _ in
         guard let controller = controller else { return }
-        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-        let alert = textAlertController(
+        let prompt = promptController(
             context: context,
-            updatedPresentationData: nil,
-            title: GGStrings.AyuFilters.dialogTitle,
-            text: GGStrings.AyuFilters.dialogPlaceholder,
-            actions: [
-                TextAlertAction(type: .genericAction, title: presentationData.strings.Common_Cancel, action: {}),
-                TextAlertAction(type: .defaultAction, title: GGStrings.AyuFilters.dialogAdd, action: {})
-            ]
+            text: GGStrings.AyuFilters.dialogTitle,
+            value: nil,
+            placeholder: GGStrings.AyuFilters.dialogPlaceholder,
+            characterLimit: 1000,
+            apply: { value in
+                guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines), !value.isEmpty else {
+                    return
+                }
+                let rule = AyuFilterRule(
+                    id: Int64(Date().timeIntervalSince1970 * 1000),
+                    dialogId: nil,
+                    text: value,
+                    reversed: false,
+                    caseInsensitive: true,
+                    enabled: true
+                )
+                AyuFiltersManager.shared.addRule(rule)
+                updateSignal.set(Void())
+            }
         )
-        controller.present(alert, in: .window(.root))
+        controller.present(prompt, in: .window(.root))
     }
 
     return controller
