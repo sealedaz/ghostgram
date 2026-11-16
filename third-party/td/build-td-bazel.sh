@@ -3,6 +3,9 @@
 set -e
 set -x
 
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/sbin:/sbin:$PATH"
+NUM_CORES=$(PATH="$PATH:/usr/sbin" sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
 ARCH="$1"
 
 SOURCE_DIR="$2"
@@ -16,14 +19,15 @@ options="$options -DOPENSSL_CRYPTO_LIBRARY=${openssl_crypto_library}"
 options="$options -DOPENSSL_INCLUDE_DIR=${OPENSSL_DIR}/src/include"
 options="$options -DCMAKE_BUILD_TYPE=Release"
 options="$options -DIOS_DEPLOYMENT_TARGET=13.0"
+options="$options -DCMAKE_C_COMPILER_LAUNCHER= -DCMAKE_CXX_COMPILER_LAUNCHER= -DCCACHE_FOUND=OFF"
 
 cd "$BUILD_DIR"
 
 # Generate source files
 mkdir native-build
 cd native-build
-cmake -DTD_GENERATE_SOURCE_FILES=ON ../td
-cmake --build . -- -j$(sysctl -n hw.ncpu)
+cmake -DTD_GENERATE_SOURCE_FILES=ON -DCMAKE_C_COMPILER_LAUNCHER= -DCMAKE_CXX_COMPILER_LAUNCHER= -DCCACHE_FOUND=OFF ../td
+cmake --build . -- -j$NUM_CORES
 cd ..
 
 if [ "$ARCH" = "arm64" ]; then
@@ -54,4 +58,4 @@ echo "set(CMAKE_SYSTEM_PROCESSOR aarch64)" >> toolchain.cmake
 echo "set(CMAKE_C_COMPILER $(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang)" >> toolchain.cmake
 
 cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DCMAKE_OSX_SYSROOT=${IOS_SYSROOT[0]} ../td $options
-make tde2e -j$(sysctl -n hw.ncpu)
+make tde2e -j$NUM_CORES
