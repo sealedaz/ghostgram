@@ -357,10 +357,11 @@ public final class ShareScreen: ViewControllerComponentContainer {
             self.accountInUse.set(externalConfiguration.environment.setAccountUserInterfaceInUse(id: context.account.id))
         }
         if let peerId = externalConfiguration?.immediatePeerId ?? immediatePeerId {
-            self.peerDisposable.set((context.engine.data.get(TelegramEngine.EngineData.Item.Peer.Peer(id: peerId))
-            |> deliverOnMainQueue).start(next: { [weak self] peer in
-                guard let self, let peer else { return }
-                self.select(peer)
+            let signal = context.engine.data.get(TelegramEngine.EngineData.Item.Peer.Peer(id: peerId))
+            |> deliverOnMainQueue
+            self.peerDisposable.set(signal.start(next: { [weak self] peer in
+                guard let strongSelf = self, let peer else { return }
+                strongSelf.select(peer)
             }))
         }
         self.configureCopy()
