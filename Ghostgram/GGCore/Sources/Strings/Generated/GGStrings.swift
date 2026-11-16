@@ -1030,6 +1030,16 @@ public enum GGStrings {
                 return GGLocalization.shared.string("appearance.messages.colorSwatchesInfo")
             }
 
+            /// Disable Colorful Replies
+            public static var disableColorfulReplies: Swift.String {
+                return GGLocalization.shared.string("appearance.messages.disableColorfulReplies")
+            }
+
+            /// Use clean monochromatic style for quote headers and reply lines without custom colored tints or background emoji
+            public static var disableColorfulRepliesInfo: Swift.String {
+                return GGLocalization.shared.string("appearance.messages.disableColorfulRepliesInfo")
+            }
+
             /// Exact «last seen» time
             public static var exactLastSeen: Swift.String {
                 return GGLocalization.shared.string("appearance.messages.exactLastSeen")

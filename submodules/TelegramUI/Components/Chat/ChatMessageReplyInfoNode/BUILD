@@ -12,6 +12,7 @@ swift_library(
     deps = [
         # GHOST: Ghostgram (W2-3)
         "//Ghostgram/GGHooks:GGHooks",
+        "//Ghostgram/Features/Appearance:GGAppearanceSettings",
         "//submodules/AsyncDisplayKit",
         "//submodules/Display",
         "//submodules/TelegramCore",

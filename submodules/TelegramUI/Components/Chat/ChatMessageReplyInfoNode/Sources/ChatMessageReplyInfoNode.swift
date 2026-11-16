@@ -19,6 +19,7 @@ import MessageInlineBlockBackgroundView
 import CheckNode
 import EmojiTextAttachmentView
 import GGHooks // GHOST: message decorations, capture protection
+import GGAppearanceSettings // GHOST: disable colorful replies
 
 public enum ChatMessageReplyInfoType {
     case bubble(incoming: Bool)
@@ -227,20 +228,22 @@ public class ChatMessageReplyInfoNode: ASDisplayNode {
             }
             
             var giftEmojiFileId: Int64?
-            switch author?.nameColor {
-            case let .preset(nameColor):
-                let colors = arguments.context.peerNameColors.get(nameColor, dark: arguments.presentationData.theme.theme.overallDarkAppearance)
-                authorNameColor = colors.main
-                dashSecondaryColor = colors.secondary
-                dashTertiaryColor = colors.tertiary
-            case let .collectible(collectibleColor):
-                let colors = collectibleColor.peerNameColors(dark: arguments.presentationData.theme.theme.overallDarkAppearance)
-                authorNameColor = colors.main
-                dashSecondaryColor = colors.secondary
-                dashTertiaryColor = colors.tertiary
-                giftEmojiFileId = collectibleColor.giftEmojiFileId
-            default:
-                break
+            if !GGAppearanceSnapshot.current.disableColorfulReplies {
+                switch author?.nameColor {
+                case let .preset(nameColor):
+                    let colors = arguments.context.peerNameColors.get(nameColor, dark: arguments.presentationData.theme.theme.overallDarkAppearance)
+                    authorNameColor = colors.main
+                    dashSecondaryColor = colors.secondary
+                    dashTertiaryColor = colors.tertiary
+                case let .collectible(collectibleColor):
+                    let colors = collectibleColor.peerNameColors(dark: arguments.presentationData.theme.theme.overallDarkAppearance)
+                    authorNameColor = colors.main
+                    dashSecondaryColor = colors.secondary
+                    dashTertiaryColor = colors.tertiary
+                    giftEmojiFileId = collectibleColor.giftEmojiFileId
+                default:
+                    break
+                }
             }
             
             if arguments.isSummarized {
@@ -913,7 +916,7 @@ public class ChatMessageReplyInfoNode: ASDisplayNode {
                 node.backgroundView.frame = backgroundFrame
                 
                 var pattern: MessageInlineBlockBackgroundView.Pattern?
-                if let backgroundEmojiId = author?.backgroundEmojiId {
+                if !GGAppearanceSnapshot.current.disableColorfulReplies, let backgroundEmojiId = author?.backgroundEmojiId {
                     pattern = MessageInlineBlockBackgroundView.Pattern(
                         context: arguments.context,
                         fileId: backgroundEmojiId,

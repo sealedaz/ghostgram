@@ -147,7 +147,8 @@ enum GGAppearanceMenu {
             ("appearance.messages.wideChannelPosts", 900, { GGStrings.Appearance.Messages.wideChannelPosts }, nil, GGAppearanceSettings.wideChannelPosts),
             ("appearance.messages.authorOnline", 1000, { GGStrings.Appearance.Messages.authorOnline }, { GGStrings.Appearance.Messages.authorOnlineInfo }, GGAppearanceSettings.authorOnlineIndicator),
             ("appearance.messages.colorSwatches", 1100, { GGStrings.Appearance.Messages.colorSwatches }, { GGStrings.Appearance.Messages.colorSwatchesInfo }, GGAppearanceSettings.colorSwatches),
-            ("appearance.messages.noSelectionBlur", 1200, { GGStrings.Appearance.Messages.noSelectionBlur }, nil, GGAppearanceSettings.noSelectionBlur)
+            ("appearance.messages.noSelectionBlur", 1200, { GGStrings.Appearance.Messages.noSelectionBlur }, nil, GGAppearanceSettings.noSelectionBlur),
+            ("appearance.messages.disableColorfulReplies", 1250, { GGStrings.Appearance.Messages.disableColorfulReplies }, { GGStrings.Appearance.Messages.disableColorfulRepliesInfo }, GGAppearanceSettings.disableColorfulReplies)
         ]
         for (id, order, title, subtitle, setting) in toggles {
             GGMenuRegistry.register(GGMenuRow(id: id, section: GGAppearanceMenu.messagesInterface, order: order, title: title, subtitle: subtitle, kind: .toggle(.global(setting))))

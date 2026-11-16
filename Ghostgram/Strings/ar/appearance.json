@@ -96,6 +96,8 @@
   "appearance.messages.hideReactionsChannels": "في القنوات",
   "appearance.messages.hideReactionsChats": "في المحادثات",
   "appearance.messages.noSelectionBlur": "بدون تمويه عند تحديد رسالة",
+  "appearance.messages.disableColorfulReplies": "تعطيل الردود الملونة",
+  "appearance.messages.disableColorfulRepliesInfo": "استخدام نمط أحادي اللون لأسطر الردود والاقتباسات دون ألوان مخصصة أو رموز تعبيرية في الخلفية",
   "appearance.messages.secondsInTime": "الثواني في الوقت",
   "appearance.messages.secondsInTimeInfo": "12:34 → 12:34:56",
   "appearance.messages.tripleTapDelete": "النقر الثلاثي",

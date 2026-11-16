@@ -96,6 +96,8 @@
   "appearance.messages.hideReactionsChannels": "In channels",
   "appearance.messages.hideReactionsChats": "In chats",
   "appearance.messages.noSelectionBlur": "No blur when a message is selected",
+  "appearance.messages.disableColorfulReplies": "Disable Colorful Replies",
+  "appearance.messages.disableColorfulRepliesInfo": "Use clean monochromatic style for quote headers and reply lines without custom colored tints or background emoji",
   "appearance.messages.secondsInTime": "Seconds in time",
   "appearance.messages.secondsInTimeInfo": "12:34 → 12:34:56",
   "appearance.messages.tripleTapDelete": "Triple tap",

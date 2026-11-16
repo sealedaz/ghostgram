@@ -96,6 +96,8 @@
   "appearance.messages.hideReactionsChannels": "У каналах",
   "appearance.messages.hideReactionsChats": "У чатах",
   "appearance.messages.noSelectionBlur": "Без розмиття під час вибору повідомлення",
+  "appearance.messages.disableColorfulReplies": "Вимкнути кольорові відповіді",
+  "appearance.messages.disableColorfulRepliesInfo": "Використовувати нейтральний стиль для цитат та відповідей без кольорових смуг і фонових емодзі",
   "appearance.messages.secondsInTime": "Секунди в часі",
   "appearance.messages.secondsInTimeInfo": "12:34 → 12:34:56",
   "appearance.messages.tripleTapDelete": "Потрійне натискання",

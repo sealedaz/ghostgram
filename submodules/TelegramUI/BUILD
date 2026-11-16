@@ -75,6 +75,7 @@ swift_library(
         # GHOST: imported directly by upstream files the features own (W2-3, W2-4)
         "//Ghostgram/Features/Shared:GGFeaturesShared",
         "//Ghostgram/Features/Appearance:GGAppearanceSettings",
+        "//Ghostgram/Features/AyuFilters:GGAyuFilters",
         # GHOST: Swiftgram-parity points imported by OpenUrl and the link menu (W5-SG)
         "//Ghostgram/Features/Extras:GGExtrasHooks",
         "//submodules/CrashReporting:CrashReporting",

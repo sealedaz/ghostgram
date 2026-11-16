@@ -18,6 +18,7 @@ import OpenUserGeneratedUrl
 import DebugCompanionScreen
 import GGFeaturesShared // GHOST: Swiftgram-parity settings (W5-SG)
 import GGExtrasHooks // GHOST: Swiftgram-parity points (W5-SG)
+import GGAyuFilters // AYUGRAM: deep links tg://ayu/*
 
 public struct ParsedSecureIdUrl {
     public let peerId: EnginePeer.Id
@@ -405,6 +406,13 @@ private func openCheckedExternalUrl(context: AccountContext, urlContext: OpenURL
             context.sharedContext.presentGlobalController(controller, nil)
         }
         return
+    }
+
+    if canonicalUrl.scheme?.lowercased() == "tg", canonicalUrl.host?.lowercased() == "ayu" {
+        dismissInput()
+        if GGAyuFiltersModule.handleDeepLink(canonicalUrl, context: context, navigationController: navigationController) {
+            return
+        }
     }
 
     if canonicalUrl.scheme == "mailto" {

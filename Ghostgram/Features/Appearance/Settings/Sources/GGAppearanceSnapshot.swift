@@ -52,6 +52,7 @@ public struct GGAppearanceSnapshot: Equatable {
     public var exactLastSeen = false
     public var tripleTapDelete: GGTripleTapDelete = .off
     public var noSelectionBlur = false
+    public var disableColorfulReplies = false
     /// 0.5…2.
     public var stickerScale: Double = 1.0
     public var stickerHideTime = false
@@ -167,6 +168,7 @@ public struct GGAppearanceSnapshot: Equatable {
         result.exactLastSeen = GGAppearanceSettings.exactLastSeen.value
         result.tripleTapDelete = GGTripleTapDelete(rawValue: GGAppearanceSettings.tripleTapDelete.value) ?? .off
         result.noSelectionBlur = GGAppearanceSettings.noSelectionBlur.value
+        result.disableColorfulReplies = GGAppearanceSettings.disableColorfulReplies.value
         result.stickerScale = ggClamp(double(GGAppearanceSettings.stickerSize) / 100.0, 0.5, 2.0)
         result.stickerHideTime = GGAppearanceSettings.stickerHideTime.value
 

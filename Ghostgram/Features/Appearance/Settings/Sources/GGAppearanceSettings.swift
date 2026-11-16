@@ -62,6 +62,7 @@ public enum GGAppearanceSettings {
     /// `GGTripleTapDelete.rawValue`.
     public static let tripleTapDelete = GGSetting<String>("appearance.messages.tripleTapDelete", default: "off")
     public static let noSelectionBlur = GGSetting<Bool>("appearance.messages.noSelectionBlur", default: false)
+    public static let disableColorfulReplies = GGSetting<Bool>("appearance.messages.disableColorfulReplies", default: false)
 
     // MARK: Chat top bar
 
