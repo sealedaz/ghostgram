@@ -1,3 +1,5 @@
+common --repository_downloader_retries=5
+
 build --action_env=ZERO_AR_DATE=1
 
 build --enable_platform_specific_config
