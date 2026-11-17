@@ -33,7 +33,7 @@ private final class AyuFiltersListArguments {
     }
 }
 
-private enum AyuFiltersListSection: Int {
+private enum AyuFiltersListSection: ItemListSectionId {
     case add = 0
     case sharedFilters = 1
     case chatFilters = 2
@@ -163,7 +163,7 @@ private enum AyuFiltersListEntry: ItemListNodeEntry {
 }
 
 public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController {
-    let updateSignal = ValuePromise<Void>(Void(), ignoreRepeated: false)
+    let updateSignal = ValuePromise<Bool>(true, ignoreRepeated: false)
 
     var selectRuleImpl: ((AyuFilterRule, ItemListController?) -> Void)?
     var addRuleImpl: ((ItemListController?) -> Void)?
@@ -178,16 +178,16 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
         },
         toggleRule: { id in
             AyuFiltersManager.shared.toggleRule(id: id)
-            updateSignal.set(Void())
+            updateSignal.set(true)
         },
         removeExclusion: { dialogId in
             AyuFiltersManager.shared.removeExclusion(dialogId: dialogId)
-            updateSignal.set(Void())
+            updateSignal.set(true)
         }
     )
 
     let signal: Signal<(ItemListControllerState, (ItemListNodeState, AyuFiltersListArguments)), NoError> = combineLatest(context.sharedContext.presentationData, updateSignal.get())
-    |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, AyuFiltersListArguments)) in
+    |> map { (presentationData: PresentationData, _: Bool) -> (ItemListControllerState, (ItemListNodeState, AyuFiltersListArguments)) in
         let config = AyuFiltersManager.shared.config
         var entries: [AyuFiltersListEntry] = []
 
@@ -249,12 +249,12 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
             ActionSheetButtonItem(title: rule.enabled ? "Disable" : "Enable", color: .accent, action: { [weak actionSheet] in
                 actionSheet?.dismissAnimated()
                 AyuFiltersManager.shared.toggleRule(id: rule.id)
-                updateSignal.set(Void())
+                updateSignal.set(true)
             }),
             ActionSheetButtonItem(title: GGStrings.AyuFilters.delete, color: .destructive, action: { [weak actionSheet] in
                 actionSheet?.dismissAnimated()
                 AyuFiltersManager.shared.removeRule(id: rule.id)
-                updateSignal.set(Void())
+                updateSignal.set(true)
             })
         ]
         actionSheet.setItemGroups([
@@ -289,7 +289,7 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
                     enabled: true
                 )
                 AyuFiltersManager.shared.addRule(rule)
-                updateSignal.set(Void())
+                updateSignal.set(true)
             }
         )
         controller.present(prompt, in: .window(.root))
