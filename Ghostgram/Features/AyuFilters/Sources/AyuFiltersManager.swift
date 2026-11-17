@@ -176,16 +176,11 @@ public final class AyuFiltersManager {
 
         // Also check media filename
         for media in message.media {
-            if let file = media as? TelegramMediaFile {
-                for attr in file.attributes {
-                    if let filenameAttr = attr as? TelegramMediaFileAttributeFilename {
-                        if messageText.isEmpty {
-                            messageText = filenameAttr.fileName
-                        } else {
-                            messageText += "\n" + filenameAttr.fileName
-                        }
-                        break
-                    }
+            if let file = media as? TelegramMediaFile, let fileName = file.fileName {
+                if messageText.isEmpty {
+                    messageText = fileName
+                } else {
+                    messageText += "\n" + fileName
                 }
             }
         }

@@ -88,7 +88,7 @@ public enum AyuFiltersImportController {
                     let previewConfig = try decoder.decode(AyuFiltersConfig.self, from: data)
 
                     let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-                    let previewText = GGStrings.AyuFilters.importPreview(filters: previewConfig.filters.count, exclusions: previewConfig.exclusions.count)
+                    let previewText = GGStrings.AyuFilters.importPreview(filters: "\(previewConfig.filters.count)", exclusions: "\(previewConfig.exclusions.count)")
 
                     let alert = textAlertController(
                         context: context,

@@ -20,12 +20,8 @@ public enum AyuFiltersMenu {
         // 1. Register AyuFilters settings tab
         GGMenuRegistry.register(tab: GGMenuTabDescriptor(
             id: self.tab,
-            section: .messagesTabs,
-            order: 250,
-            title: { GGStrings.AyuFilters.title },
-            info: { GGStrings.AyuFilters.toggleInfo },
-            icon: .bundle("Chat/Context Menu/Restrict"),
-            emoji: "🛡️"
+            parent: .category(.messages),
+            title: { GGStrings.AyuFilters.title }
         ))
 
         GGMenuRegistry.register(section: GGMenuSectionDescriptor(
@@ -33,6 +29,17 @@ public enum AyuFiltersMenu {
             screen: .tab(self.tab),
             order: 100,
             header: { GGStrings.AyuFilters.title }
+        ))
+
+        // Row in Messages -> Chats to navigate to AyuFilters tab
+        GGMenuRegistry.register(GGMenuRow(
+            id: "messages.ayuFilters",
+            section: .messagesChats,
+            order: 450,
+            title: { GGStrings.AyuFilters.title },
+            subtitle: { GGStrings.AyuFilters.toggleInfo },
+            icon: .bundle("Chat/Context Menu/Restrict"),
+            kind: .tab(self.tab)
         ))
 
         // Toggle: Enable Filters
@@ -131,7 +138,7 @@ public enum AyuFiltersMenu {
 
                 do {
                     let result = try AyuFiltersManager.shared.importConfig(from: data, merge: true)
-                    let text = GGStrings.AyuFilters.importSuccess(filters: result.filtersAdded, exclusions: result.exclusionsAdded)
+                    let text = GGStrings.AyuFilters.importSuccess(filters: "\(result.filtersAdded)", exclusions: "\(result.exclusionsAdded)")
                     let toast = UndoOverlayController(
                         presentationData: presentationData,
                         content: .info(title: nil, text: text, timeout: nil, customUndoText: nil),

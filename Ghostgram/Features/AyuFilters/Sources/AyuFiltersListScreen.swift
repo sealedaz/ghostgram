@@ -186,8 +186,8 @@ public func makeAyuFiltersListScreen(context: AccountContext) -> ViewController 
         }
     )
 
-    let signal = combineLatest(context.sharedContext.presentationData, updateSignal.get())
-    |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, Any)) in
+    let signal: Signal<(ItemListControllerState, (ItemListNodeState, AyuFiltersListArguments)), NoError> = combineLatest(context.sharedContext.presentationData, updateSignal.get())
+    |> map { presentationData, _ -> (ItemListControllerState, (ItemListNodeState, AyuFiltersListArguments)) in
         let config = AyuFiltersManager.shared.config
         var entries: [AyuFiltersListEntry] = []
 
