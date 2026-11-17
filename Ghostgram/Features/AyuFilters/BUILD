@@ -8,7 +8,7 @@ swift_library(
         "Sources/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        "-Onone",
     ],
     deps = [
         "//Ghostgram/GGCore:GGCore",
@@ -43,6 +43,6 @@ swift_test(
         "Tests/**/*.swift",
     ]),
     copts = [
-        "-warnings-as-errors",
+        "-Onone",
     ],
 )

@@ -17,33 +17,50 @@ public final class AyuFiltersManager {
     private let lock = NSLock()
 
     private init() {
-        let loaded = self.storage.load()
+        var loaded = self.storage.load()
+        loaded.isEnabled = GGAyuFiltersSettings.enabled.value
+        loaded.autoClickButtonsEnabled = GGAyuFiltersSettings.autoClickButtons.value
         self.config = loaded
         self.engine.compile(config: loaded)
+
+        _ = GGAyuFiltersSettings.enabled.signal.start(next: { [weak self] enabled in
+            self?.setEnabled(enabled, updateSetting: false)
+        })
+        _ = GGAyuFiltersSettings.autoClickButtons.signal.start(next: { [weak self] enabled in
+            self?.setAutoClickButtonsEnabled(enabled, updateSetting: false)
+        })
     }
 
     public func reload() {
         self.lock.lock()
-        let loaded = self.storage.load()
+        var loaded = self.storage.load()
+        loaded.isEnabled = GGAyuFiltersSettings.enabled.value
+        loaded.autoClickButtonsEnabled = GGAyuFiltersSettings.autoClickButtons.value
         self.config = loaded
         self.engine.compile(config: loaded)
         self.lock.unlock()
     }
 
-    public func setEnabled(_ enabled: Bool) {
+    public func setEnabled(_ enabled: Bool, updateSetting: Bool = true) {
         self.lock.lock()
         self.config.isEnabled = enabled
         self.storage.save(self.config)
         self.engine.compile(config: self.config)
         self.lock.unlock()
+        if updateSetting && GGAyuFiltersSettings.enabled.value != enabled {
+            GGAyuFiltersSettings.enabled.set(enabled)
+        }
     }
 
-    public func setAutoClickButtonsEnabled(_ enabled: Bool) {
+    public func setAutoClickButtonsEnabled(_ enabled: Bool, updateSetting: Bool = true) {
         self.lock.lock()
         self.config.autoClickButtonsEnabled = enabled
         self.storage.save(self.config)
         self.engine.compile(config: self.config)
         self.lock.unlock()
+        if updateSetting && GGAyuFiltersSettings.autoClickButtons.value != enabled {
+            GGAyuFiltersSettings.autoClickButtons.set(enabled)
+        }
     }
 
     public func addRule(_ rule: AyuFilterRule) {

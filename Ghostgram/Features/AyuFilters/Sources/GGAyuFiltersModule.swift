@@ -58,7 +58,15 @@ public enum GGAyuFiltersModule {
                 context.sharedContext.presentGlobalController(controller, nil)
             }
             if let text = param("text"), !text.isEmpty {
-                AyuFiltersManager.shared.addRule(pattern: text)
+                let rule = AyuFilterRule(
+                    id: Int64(Date().timeIntervalSince1970 * 1000),
+                    dialogId: nil,
+                    text: "<type>contains</type>\(text)",
+                    reversed: false,
+                    caseInsensitive: true,
+                    enabled: true
+                )
+                AyuFiltersManager.shared.addRule(rule)
             }
             return true
         } else if path.hasPrefix("/filters") || path.hasPrefix("/settings") || path.isEmpty {

@@ -37,17 +37,12 @@ public enum AyuFiltersMenu {
 
         // Toggle: Enable Filters
         GGMenuRegistry.register(GGMenuRow(
-            id: "ayuFilters.isEnabled",
+            id: "ayuFilters.enabled",
             section: self.mainSection,
             order: 100,
             title: { GGStrings.AyuFilters.toggle },
             subtitle: { GGStrings.AyuFilters.toggleInfo },
-            kind: .custom(build: { _ in nil }, isChanged: { _ in false }, getDisplayValue: { _ in
-                AyuFiltersManager.shared.config.isEnabled ? "ON" : "OFF"
-            }, action: { _, _ in
-                let current = AyuFiltersManager.shared.config.isEnabled
-                AyuFiltersManager.shared.setEnabled(!current)
-            })
+            kind: .toggle(.global(GGAyuFiltersSettings.enabled))
         ))
 
         // Toggle: Auto-click Buttons (<button>)
@@ -57,12 +52,7 @@ public enum AyuFiltersMenu {
             order: 200,
             title: { GGStrings.AyuFilters.autoClick },
             subtitle: { GGStrings.AyuFilters.autoClickInfo },
-            kind: .custom(build: { _ in nil }, isChanged: { _ in false }, getDisplayValue: { _ in
-                AyuFiltersManager.shared.config.autoClickButtonsEnabled ? "ON" : "OFF"
-            }, action: { _, _ in
-                let current = AyuFiltersManager.shared.config.autoClickButtonsEnabled
-                AyuFiltersManager.shared.setAutoClickButtonsEnabled(!current)
-            })
+            kind: .toggle(.global(GGAyuFiltersSettings.autoClickButtons))
         ))
 
         // Open Filters List Screen
@@ -71,8 +61,9 @@ public enum AyuFiltersMenu {
             section: self.mainSection,
             order: 300,
             title: { GGStrings.AyuFilters.list },
-            kind: .navigation(destination: { context in
-                return makeAyuFiltersListScreen(context: context)
+            kind: .action({ context in
+                let controller = makeAyuFiltersListScreen(context: context.context)
+                context.push(controller)
             })
         ))
 
@@ -82,13 +73,14 @@ public enum AyuFiltersMenu {
             section: self.mainSection,
             order: 400,
             title: { GGStrings.AyuFilters.importUrl },
-            kind: .action({ context, controller in
-                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            kind: .action({ context in
+                let presentationData = context.presentationData
+                let accountContext = context.context
                 let clipboardString = UIPasteboard.general.string
                 let suggestedValue: String? = (clipboardString?.contains("dpaste") == true || clipboardString?.contains("github") == true || clipboardString?.contains("pastebin") == true || clipboardString?.contains("nekobin") == true) ? clipboardString : nil
 
                 let prompt = promptController(
-                    context: context,
+                    context: accountContext,
                     text: GGStrings.AyuFilters.importUrl,
                     subtitle: "dpaste.com, gist.githubusercontent.com, pastebin.com, nekobin.com",
                     value: suggestedValue,
@@ -98,8 +90,8 @@ public enum AyuFiltersMenu {
                         guard let raw = urlString?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else { return }
                         AyuFiltersImportController.fetchAndPreview(
                             urlString: raw,
-                            context: context,
-                            present: { c in controller.present(c, in: .window(.root)) },
+                            context: accountContext,
+                            present: { c in context.push(c) },
                             onComplete: {
                                 let toast = UndoOverlayController(
                                     presentationData: presentationData,
@@ -107,12 +99,12 @@ public enum AyuFiltersMenu {
                                     elevatedLayout: false,
                                     action: { _ in false }
                                 )
-                                context.sharedContext.mainWindow?.present(toast, on: .root)
+                                accountContext.sharedContext.mainWindow?.present(toast, on: .root)
                             }
                         )
                     }
                 )
-                controller.present(prompt, in: .window(.root))
+                accountContext.sharedContext.mainWindow?.present(prompt, on: .root)
             })
         ))
 
@@ -122,17 +114,18 @@ public enum AyuFiltersMenu {
             section: self.mainSection,
             order: 500,
             title: { GGStrings.AyuFilters.importClipboard },
-            kind: .action({ context, _ in
-                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            kind: .action({ context in
+                let presentationData = context.presentationData
+                let accountContext = context.context
                 guard let string = UIPasteboard.general.string, let data = string.data(using: .utf8) else {
                     let alert = textAlertController(
-                        context: context,
+                        context: accountContext,
                         updatedPresentationData: nil,
                         title: GGStrings.AyuFilters.importError,
                         text: "Clipboard does not contain valid text.",
                         actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]
                     )
-                    context.sharedContext.mainWindow?.present(alert, on: .root)
+                    accountContext.sharedContext.mainWindow?.present(alert, on: .root)
                     return
                 }
 
@@ -145,16 +138,16 @@ public enum AyuFiltersMenu {
                         elevatedLayout: false,
                         action: { _ in false }
                     )
-                    context.sharedContext.mainWindow?.present(toast, on: .root)
+                    accountContext.sharedContext.mainWindow?.present(toast, on: .root)
                 } catch {
                     let alert = textAlertController(
-                        context: context,
+                        context: accountContext,
                         updatedPresentationData: nil,
                         title: GGStrings.AyuFilters.importError,
                         text: "Failed to parse JSON: \(error.localizedDescription)",
                         actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]
                     )
-                    context.sharedContext.mainWindow?.present(alert, on: .root)
+                    accountContext.sharedContext.mainWindow?.present(alert, on: .root)
                 }
             })
         ))
@@ -165,8 +158,9 @@ public enum AyuFiltersMenu {
             section: self.mainSection,
             order: 600,
             title: { GGStrings.AyuFilters.export },
-            kind: .action({ context, _ in
-                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            kind: .action({ context in
+                let presentationData = context.presentationData
+                let accountContext = context.context
                 if let json = AyuFiltersStorage.shared.exportJsonString() {
                     UIPasteboard.general.string = json
                     let toast = UndoOverlayController(
@@ -175,7 +169,7 @@ public enum AyuFiltersMenu {
                         elevatedLayout: false,
                         action: { _ in false }
                     )
-                    context.sharedContext.mainWindow?.present(toast, on: .root)
+                    accountContext.sharedContext.mainWindow?.present(toast, on: .root)
                 }
             })
         ))
