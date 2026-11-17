@@ -5270,15 +5270,10 @@ extension ChatControllerImpl {
                     let actions: [TextAlertAction]
                     if reason == .tooMuchScheduled {
                         actions = [
-                            TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.ScheduledMessages_SendNow, action: {
-                                if let strongSelf = self {
-                                    let failedIds = strongSelf.context.account.postbox.failedMessageIds(for: peerId)
-                                    if !failedIds.isEmpty {
-                                        let _ = resendMessages(account: strongSelf.context.account, messageIds: failedIds, removeSchedule: true).startStandalone()
-                                    }
-                                }
+                            TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.ScheduledMessages_Title, action: {
+                                self?.openScheduledMessages()
                             }),
-                            TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_Cancel, action: {})
+                            TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_OK, action: {})
                         ]
                     } else if moreInfo {
                         actions = [TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.Generic_ErrorMoreInfo, action: {
